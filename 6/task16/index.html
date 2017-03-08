@@ -106,7 +106,13 @@
 
 
 
-
+        .progress-bar-wrap{
+            background-color: transparent;
+            height: 1px;
+            margin: 13px 0;
+            padding: 2px 0;
+            cursor: pointer;
+        }
         .full-progress-bar,.current-progess-bar{
 
             height:0;
@@ -115,7 +121,8 @@
         .full-progress-bar{
             position: relative;
             width:100%;
-            margin: 15px 0;
+            /*margin: 15px 0;*/
+
         }
         .current-progess-bar{
             position: absolute;
@@ -181,8 +188,10 @@
                         <span class="shareBtn fa fa-share-alt control-btn" id="shareBtn"></span>
                     </div>
                 </div>
-                <div class="full-progress-bar">
-                    <div class="current-progess-bar"></div>
+                <div class="progress-bar-wrap">
+                    <div class="full-progress-bar">
+                        <div class="current-progess-bar"></div>
+                    </div>
                 </div>
                 <!--<audio controls>-->
                     <!--<source src="./audios/1.mp3" type="audio/mp3">-->
@@ -353,8 +362,8 @@
         }, false)
 
         function play(){
-//            audioPlayer.currentTime = 200
-            if(audioPlayer.paused){
+//            audioPlayer.currentTime = 100
+            if(audioPlayer.paused || audioPlayer.ended){
                 audioPlayer.play()
                 changeWidthInterval = setInterval(function () {
                     getCurrentWidth(audioPlayer, currentProgressBar)
@@ -386,10 +395,20 @@
         }
         startAndPauseBtn.addEventListener('click', play, false)
 
+        var progressBarWrap = document.querySelector('.progress-bar-wrap')
         // todo 点击调整播放位置
-        fullProgressBar.addEventListener('click', changeAudioStartFn, false)
-        function changeAudioStartFn() {
+        function changeCurrentTime(audioObj, startSecond) {
+            if(startSecond<0 || startSecond>audioObj.duration)
+                return false
+            audioObj.currentTime = startSecond
+            getCurrentWidth(audioPlayer, currentProgressBar)
+        }
+        progressBarWrap.addEventListener('click', changeAudioStartFn, false)
+        function changeAudioStartFn(event) {
+            // 用event.target.offsetLeft有时因为冒泡有问题
+            var rate = (event.clientX-progressBarWrap.offsetLeft)/progressBarWrap.offsetWidth
 
+            changeCurrentTime(audioPlayer, rate*audioPlayer.duration)
         }
 
         // todo 调整音量，hover效果，点击调整大小，大小0-1
