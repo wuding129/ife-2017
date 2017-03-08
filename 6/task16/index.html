@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>豆瓣FM</title>
+    <link rel="stylesheet" href="./fonts/font-awesome/css/font-awesome.min.css">
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .fl{
+            float: left;
+        }
+        .fr{
+            float: right;
+        }
+        .clear-float{
+            overflow: hidden;
+        }
+        .red-icon{
+            color: red;
+        }
+
+
+
+        .wrap{
+            width:700px;
+            height:400px;
+            margin:20px auto;
+            background-color: #f3f3f3;
+            /*font-size: 0;*/
+        }
+
+
+
+        .music-section,.cover{
+            height: 200px;
+            padding: 15px;
+            /*display: inline-block;*/
+            /*font-size: 12px;*/
+        }
+        .music-section{
+            width: 60%;
+        }
+        .audio-section{
+            padding:10px 0;
+        }
+        /*时间*/
+        .time,.vol-btn{
+            float: left;
+        }
+        .time{
+            padding-right:11px;
+        }
+        .vol{
+            width:16px;
+            height:16px;
+        }
+        /*音量*/
+        .vol-btn{
+            position: relative;
+            width:15px;
+        }
+        .vol-btn:hover{
+            width: 85px;
+        }
+        .vol-btn:hover .full-vol,.vol-btn:hover .vol-bar{
+            width:70px;
+        }
+        /*.vol-btn:hover .current-vol{
+            width:50%;
+        }*/
+        .vol-bar{
+            height:18px;
+            width:0;
+
+            background-color: transparent;
+            position: absolute;
+            left:19px;
+            top:0;
+            padding-top:8px;
+        }
+        .full-vol,.current-vol{
+            -webkit-transition: width .5s;
+            -moz-transition: width .5s;
+            -ms-transition: width .5s;
+            -o-transition: width .5s;
+            transition: width .5s;
+        }
+        .full-vol{
+            /*display: none;*/
+            height:2px;
+            width:0;
+            background-color: #ddd;
+
+        }
+        .current-vol{
+            width:0;
+            /*position: absolute;*/
+            /*top:0;*/
+            /*left:0;*/
+            height:2px;
+            background-color: #aaa;
+        }
+
+
+
+
+        .full-progress-bar,.current-progess-bar{
+
+            height:0;
+            border-top: 1px solid #ccc;
+        }
+        .full-progress-bar{
+            position: relative;
+            width:100%;
+            margin: 15px 0;
+        }
+        .current-progess-bar{
+            position: absolute;
+            top:0;
+            left:0;
+            width: 0;
+            border-color: #8bff00;
+        }
+
+
+        .control-section{
+            padding: 15px 0;
+            font-size: 25px;
+        }
+        .control-btn{
+            cursor: pointer;
+        }
+        .control-btn-group{
+
+        }
+        .downloadBtn,.del,.play-pause{
+            margin:0 15px;
+        }
+
+        .cover{
+            width: 30%;
+            -webkit-border-radius:50%;
+            -moz-border-radius:50%;
+            border-radius:50%;
+            /*background: url("https://img3.doubanio.com/lpic/s10433413.jpg") no-repeat;*/
+            /*-webkit-background-size: cover;*/
+            /*background-size: cover;*/
+            background: url(https://img3.doubanio.com/lpic/s10433413.jpg) no-repeat -11% 43%;
+            -webkit-background-size: cover;
+            background-size: 79% 54%;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="music-section fl">
+            <div class="info">
+                <h2 class="name">music name</h2>
+                <h4 class="singer">陈奕迅</h4>
+            </div>
+            <div class="audio-section">
+                <div class="audio-info clear-float">
+                    <div class="fl">
+                        <span class="time" id="restTime">-00:00</span>
+                        <div class="control-btn vol-btn">
+                            <span class="vol fa fa-volume-up" id="vol"></span>
+                            <div class="vol-bar">
+                                <div class="full-vol">
+                                    <div class="current-vol"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fr">
+                        <span class="lyrics fa fa-file-text-o control-btn" id="lyricsBtn"></span>
+                        <span class="downloadBtn fa fa-download control-btn" id="downloadBtn control-btn"></span>
+                        <span class="shareBtn fa fa-share-alt control-btn" id="shareBtn"></span>
+                    </div>
+                </div>
+                <div class="full-progress-bar">
+                    <div class="current-progess-bar"></div>
+                </div>
+                <!--<audio controls>-->
+                    <!--<source src="./audios/1.mp3" type="audio/mp3">-->
+                    <!--<p>Your browser doesn't support HTML5 audio. Here is a <a href="./audios/1.mp3">link to the audio</a> instead.</p>-->
+                <!--</audio>-->
+                <audio id="audioPlayer" src="./audios/2.mp3">
+                    Your browser does not support the <code>audio</code> element.
+                </audio>
+            </div>
+            <div class="control-section clear-float">
+                <div class="fl">
+                    <span class="like fa fa-heart control-btn" id="likeBtn"></span>
+                    <span class="del fa fa-trash control-btn" id="delBtn"></span>
+                </div>
+                <div class="fr">
+                    <span class="play-pause fa fa-play control-btn" id="startAndPauseBtn"></span>
+                    <span class="next fa fa-step-forward control-btn" id="nextBtn"></span>
+                </div>
+            </div>
+        </div>
+        <div class="cover fr">
+        </div>
+    </div>
+</body>
+<script>
+    window.onload = function () {
+        var audioPlayer = document.getElementById('audioPlayer')
+
+
+        // todo 点击是否喜欢此歌曲
+
+        var isLike = false,
+            likeBtn = document.getElementById('likeBtn')
+        function like() {
+            isLike = !isLike
+            likeBtn.classList.toggle('red-icon')
+            console.log('是否喜欢：' + isLike)
+        }
+        likeBtn.addEventListener('click', like, false)
+
+
+        // todo 从列表里删除
+        var delBtn = document.getElementById('delBtn')
+        function del() {
+            // todo 弹框确认删除
+            console.log('是否删除？')
+            // todo 确认后发送ajax事件，并获取下一首
+        }
+        delBtn.addEventListener('click', del, false)
+
+        // todo 点击切换下一首
+        function next() {
+            console.log('下一首')
+        }
+
+        // todo 点击切换上一首
+        function pre() {
+            // todo 判断是否第一首，有无上一首，有切换，没有弹出提示
+            console.log('上一首')
+        }
+
+        // todo 显示/隐藏歌词面板
+        function showLyrics() {
+
+        }
+
+        // todo 根据播放进度匹配当前歌词，自动滚动，
+        // todo 手动滚动后暂停自动滚动，不操作3秒后继续匹配当前歌词，自动滚动
+
+
+        // todo 下载歌曲
+        function download() {
+
+        }
+
+        // todo 分享歌曲，弹出分享选择窗，点击其他地方关闭
+        function share() {
+
+        }
+
+
+        // todo 显示/隐藏播放列表
+        function showList() {
+
+        }
+
+
+
+
+
+        /**
+         * 播放信息相关
+         */
+
+        // todo 切换播放模式
+
+
+        // todo 根据已经播放秒数比上总秒数算进度条长度
+        // todo 获取进度条完整长度
+        var getWidth = function (obj) {
+            return obj.offsetWidth
+        }
+        var fullProgressBar = document.querySelector('.full-progress-bar')
+        var currentProgressBar = document.querySelector('.current-progess-bar')
+        // 初始化长度
+        var initCurrentProgressBarWidth = function (initObj, initWidth) {
+            initObj.style.width = initWidth + 'px'
+        }
+        initCurrentProgressBarWidth(currentProgressBar, 0)
+        var fullWidth = getWidth(fullProgressBar)
+        console.log(fullWidth)
+
+        // todo 获取当前进度条长度
+        var getCurrentWidth = function (audioObj,targetObj) {
+            var rate = audioObj.currentTime/audioObj.duration
+            return targetObj.style.width = fullWidth*rate + 'px'
+        }
+
+
+
+        // todo 根据总秒数减去已经播放秒数算剩余时长，
+        // todo 格式化为-00：00：00，没有超过一小时不显示小时位
+        var formateTime = function (str) {
+            str = +str<10
+                ?'0'+str
+                :str
+            return str
+        }
+
+        var timeFn = function (time) {
+            var h,m,s
+            h = parseInt(time/3600)+''
+            m = parseInt((time-h*3600)/60)+''
+            s = parseInt(time-h*3600-m*60)+''
+
+            h = formateTime(h)
+            m = formateTime(m)
+            s = formateTime(s)
+            return {
+                h: h,
+                m: m,
+                s: s
+            }
+        }
+        var getTimeStr = function (timeObj) {
+            var hStr = +timeObj.h?(timeObj.h+':'):(audioPlayer.duration>3600)?'00:':'',
+                mStr = +timeObj.m?timeObj.m+':':'00:',
+                sStr = +timeObj.s?timeObj.s:'00'
+            return hStr + mStr + sStr
+        }
+        function getRestTime(time) {
+            var currentRestTime, timeObj
+
+            timeObj = timeFn(time)
+            return currentRestTime = getTimeStr(timeObj)
+        }
+
+        // todo 播放开始/暂停
+        var startAndPauseBtn = document.getElementById('startAndPauseBtn'),
+            restTimeNode = document.getElementById('restTime'),
+            changeWidthInterval
+
+        function initRestTime(audioObj, restTimeNode) {
+            restTimeNode.innerHTML = '-' + getRestTime(audioObj.duration)
+        }
+        audioPlayer.addEventListener('loadedmetadata',function () {
+            initRestTime(audioPlayer, restTimeNode)
+        }, false)
+
+        function play(){
+            audioPlayer.currentTime = 200
+            if(audioPlayer.paused){
+                audioPlayer.play()
+                changeWidthInterval = setInterval(function () {
+                    getCurrentWidth(audioPlayer, currentProgressBar)
+                    var rest = audioPlayer.duration - audioPlayer.currentTime
+                    restTimeNode.innerHTML = '-'+getRestTime(rest)
+                    if(audioPlayer.ended){
+                        clearInterval(changeWidthInterval)
+                        initRestTime(audioPlayer, restTimeNode)
+                        initCurrentProgressBarWidth(currentProgressBar, 0)
+                        startAndPauseBtn.classList.toggle('fa-pause')
+                    }
+                },500)
+
+            }else{
+                audioPlayer.pause()
+                if(changeWidthInterval)
+                    clearInterval(changeWidthInterval)
+//                console.log('当前播放位置1'+ audioPlayer.played.start(0))
+//                console.log('当前播放位置1'+ audioPlayer.played.end(0))
+
+            }
+            startAndPauseBtn.classList.toggle('fa-pause')
+//            console.log('音频长度：'+audioPlayer.duration)
+//            console.log('当前播放位置'+ audioPlayer.currentTime)
+//            console.log('当前播放位置'+ audioPlayer.duration)
+//            console.log('当前播放位置'+ audioPlayer.duration/60)
+
+
+        }
+        startAndPauseBtn.addEventListener('click', play, false)
+
+        // todo 点击调整播放位置
+        fullProgressBar.addEventListener('click', changeAudioStartFn, false)
+        function changeAudioStartFn() {
+
+        }
+
+        // todo 调整音量，hover效果，点击调整大小，大小0-1
+        var volBtn        = document.querySelector('.vol-btn'),
+            volBarWrap    = document.querySelector('.vol-bar'),
+            currentValBAr = document.querySelector('.current-vol'),
+            muteBtn       = document.querySelector('#vol')
+        // 用来存宽度
+        var widthStore = 35
+
+        // todo 计算音量大小
+        var changeVol = function (event) {
+//            console.log(volBarWrap.offsetLeft)
+//            console.log(volBarWrap.offsetParent.offsetLeft)
+//            console.log(volBarWrap.offsetWidth)
+//            console.log(event.clientX)
+//            console.log(event.clientX-volBarWrap.offsetParent.offsetLeft-volBarWrap.offsetLeft)
+            widthStore = event.clientX-volBarWrap.offsetParent.offsetLeft-volBarWrap.offsetLeft
+
+            currentValBAr.style.width = widthStore + 'px'
+            audioPlayer.volume = widthStore/volBarWrap.offsetWidth
+
+            if(isMute)
+                muteFn()
+        }
+
+        var mouseoverFn = function (event) {
+            currentValBAr.style.width = widthStore + 'px'
+        }
+        var mouseoutFn = function (event) {
+            currentValBAr.style.width = '0px'
+        }
+        volBtn.addEventListener('mouseover',mouseoverFn, false)
+        volBtn.addEventListener('mouseout',mouseoutFn, false)
+        volBarWrap.addEventListener('click',changeVol ,false)
+        muteBtn.addEventListener('click', muteFn, false)
+        var isMute = false
+        function muteFn() {
+//            event = event || window.event
+//            event.stopPropagation()
+            isMute = !isMute
+            muteBtn.classList.toggle('fa-volume-off')
+            muteBtn.classList.toggle('fa-volume-up')
+            audioPlayer.muted = isMute
+            currentValBAr.style.visibility = isMute
+                                           ? 'hidden'
+                                           : 'visible'
+            return false
+
+
+        }
+
+
+
+    }
+</script>
+</html>
