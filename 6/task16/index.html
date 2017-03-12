@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>豆瓣FM</title>
+    <title>FM</title>
     <link rel="stylesheet" href="./fonts/font-awesome/css/font-awesome.min.css">
     <style>
         *{
@@ -618,12 +618,6 @@
 
             }
             startAndPauseBtn.classList.toggle('fa-pause')
-//            console.log('音频长度：'+audioPlayer.duration)
-//            console.log('当前播放位置'+ audioPlayer.currentTime)
-//            console.log('当前播放位置'+ audioPlayer.duration)
-//            console.log('当前播放位置'+ audioPlayer.duration/60)
-
-
         }
         startAndPauseBtn.addEventListener('click', play, false)
 
@@ -675,8 +669,6 @@
         muteBtn.addEventListener('click', muteFn, false)
         var isMute = false
         function muteFn() {
-//            event = event || window.event
-//            event.stopPropagation()
             isMute = !isMute
             muteBtn.classList.toggle('fa-volume-off')
             muteBtn.classList.toggle('fa-volume-up')
@@ -692,5 +684,14 @@
 
 
     }
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?bd0571c810dc4665e57401e3d50a60ac";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
 </script>
 </html>
